@@ -19,12 +19,29 @@ var data1 = [];
 
    };
 
-   function insertTitles(){
-         document.getElementById("neighborhood").append("<h2>NEIGHBORHOOD ANALYSIS</h2>");
-         document.getElementById("charts").append("<h2>RESTAURANT PERFORMANCE ANALYSIS</h2>");
-         document.getElementById("gauge").append("<h4><u>Sentiment Split across Customer Reviews</u></h4>");
-         document.getElementById("sentiment").append("<h2>CUSTOMER SENTIMENT ANALYSIS</h2><br/><br/><p>Please Select the Star Rating to generate the word bubble.</p>");
-       }
+   // function insertTitles(){
+   //         var para = document.createElement("h2");                 // Create a <p> element
+   //      para.innerHTML = "<center>NEIGHBORHOOD ANALYSIS</center>"
+   //
+   //      document.getElementById("neighborhood").append(para);
+   //      var para = document.createElement("h2");                 // Create a <p> element
+   //      para.innerHTML = "<center>RESTAURANT PERFORMANCE ANALYSIS</center>"
+   //      document.getElementById("charts").append(para);
+   //      var para1=document.createElement("h4");
+   //
+   //      para1.innerHTML = "<center><u>Sentiment Split across Customer Reviews</u></center>"
+   //      document.getElementById("gauge").append(para1);
+   //      var para1 = document.createElement("h2")
+   //      para1.innerHTML = "<center>CUSTOMER SENTIMENT ANALYSIS</center>"//<br/><br/><p>Please Select the Star Rating to generate the word bubble.</p>"
+   //      document.getElementById("sentiment").append(para1);
+   //      var a = document.createElement("br")
+   //      document.getElementById("sentiment").append(a);
+   //      var a = document.createElement("br")
+   //      document.getElementById("sentiment").append(a);
+   //      var a = document.createElement("p");
+   //      a.innerHTML = "Please Select the Star Rating to generate the word bubble."
+   //      document.getElementById("sentiment").append(a);
+   //     }
 
 function fetchData() {
     d3.csv("restaurants.csv", function(error, data) {
@@ -34,28 +51,27 @@ function fetchData() {
         })
         restaurantData = data;
         createMap(restaurantData);
-        // createCuisinesChart(restaurantData);
-        // createCharts();
+        createCuisinesChart(restaurantData);
+        createCharts();
 
-        //Creating the tornado chart
-        // var tornado_data = d3.json("word_semantic_strength_top10_New_2.json",function(error,tornado_data){
-        //   tornado_data.forEach(function(d)
-        //   {
-        //     console.log("tornado")
-        //     if (d["id"] == test)
-        //     {
-        //
-        //       var chart = createTornadoChart(test)
-        //       console.log("Tornado")
-        //       d3.select("#tornado")
-        //       .datum(d["words"])
-        //       .call(chart);
-        //     }
-        //   }
-        //   );
-        // });
-        // createWordBubble("28hruDLwF_5s0QtDWH4rpg");
-        // drawGaugeChart("-0WegMt6Cy966qlDKhu6jA")
+        var tornado_data = d3.json("word_semantic_strength_top10_New_2.json",function(error,tornado_data){
+          tornado_data.forEach(function(d)
+          {
+            console.log("tornado")
+            if (d["id"] == test)
+            {
+
+              var chart = createTornadoChart(test)
+              console.log("Tornado")
+              d3.select("#tornado")
+              .datum(d["words"])
+              .call(chart);
+            }
+          }
+          );
+        });
+        createWordBubble("28hruDLwF_5s0QtDWH4rpg");
+        drawGaugeChart("-0WegMt6Cy966qlDKhu6jA")
 
     });
 };
@@ -100,7 +116,7 @@ function createMap(data) {
             inRangeRestaurants.push(location);
         }
     });
-    //createRatingsChart(inRangeRestaurants);
+    createRatingsChart(inRangeRestaurants);
     for (var i = 0; i < restaurants.length; i += 1) {
 
         L.circleMarker([restaurants[i]["latitude"], restaurants[i]["longitude"]], geojsonMarkerOptions).bindPopup(restaurants[i]["name"], {
@@ -131,7 +147,7 @@ function createMap(data) {
             d3.select(".ratings").remove();
             d3.select(".tornado").remove();
 
-            insertTitles();
+            //insertTitles();
 
             createRatingsChart(inRangeRestaurants);
             createCuisinesChart(inRangeRestaurants);
@@ -536,6 +552,7 @@ svg.append("text")
       .call(d3.axisLeft(y));
   });
 
+d3.select("#charts").append("br").append("br")
 // d3.csv("starwise_count.csv", function(data) {
 //     var dat = []
 //     data.forEach(function(d) {
@@ -622,7 +639,7 @@ height = 400//500 - margin.top - margin.bottom;
     .attr("text-anchor", "middle")
     .style("font-size", "18px")
     .style("text-decoration", "underline")
-    .text("Weekly Check-In Distribution.");
+    .text("Weekly Check-In Distribution");
 
             }
 
