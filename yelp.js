@@ -214,7 +214,7 @@ function createRatingsChart(data) {
             }
         })
     });
-    var margin = {top: 20, right: 20, bottom: 50, left: 70},
+    var margin = {top: 60, right: 20, bottom: 50, left: 70},
     width = 600,//960 - margin.left - margin.right,
     height = 380//500 - margin.top - margin.bottom;
     // set the ranges
@@ -261,7 +261,7 @@ function createRatingsChart(data) {
     svg.append("text")
       .attr("transform",
             "translate(" + (width/2) + " ," +
-                           (height + margin.top + 20) + ")")
+                           (height + margin.top - 15) + ")")
       .style("text-anchor", "middle")
       .text("Star Ratings of Neighborhood Business");
     svg.append("g").call(d3.axisLeft(y));
@@ -274,7 +274,7 @@ function createRatingsChart(data) {
       .text("Count");
     svg.append("text")
         .attr("x", (width / 2))
-        .attr("y", 20 - (margin.top / 2))
+        .attr("y", 5 - (margin.top / 2))
         .attr("text-anchor", "middle")
         .style("font-size", "18px")
         .style("text-decoration", "underline")
@@ -316,9 +316,9 @@ function createCuisinesChart(data) {
             }
         });
     });
-    var margin = {top: 20, right: 20, bottom: 50, left: 70},
+    var margin = {top: 60, right: 35, bottom: 50, left: 70},
     width = 550//960 - margin.left - margin.right,
-    height = 350//500 - margin.top - margin.bottom;
+    height = 380//500 - margin.top - margin.bottom;
     var svg = d3.select("#cuisine").style("display", "inline").style("width", "50%").append("svg").attr("class", "cuisineChart").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var x = d3.scaleLinear().range([0, width]).domain([0, d3.max(top_cuisines, function(d) {
         return d.count+5;
@@ -366,7 +366,7 @@ d3.csv("ratings_and_reviews_yearwise.csv", function(data1) {
     }
     });
     console.log(dat)
-var margin = {top: 20, right: 20, bottom: 50, left: 70},
+var margin = {top: 60, right: 20, bottom: 50, left: 70},
     width = 600//960 - margin.left - margin.right,
     height = 400//500 - margin.top - margin.bottom;
 
@@ -450,7 +450,8 @@ svg.append("path")
               var matrix = this.getScreenCTM()
                         .translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 
-
+              div.style("width","110px");
+              div.style("height","20px");
               div.transition()
                         .duration(200)
                         .style("opacity", 1);
@@ -552,7 +553,7 @@ svg.append("text")
       .call(d3.axisLeft(y));
   });
 
-d3.select("#charts").append("br").append("br")
+//d3.select("#charts").append("br").append("br");
 // d3.csv("starwise_count.csv", function(data) {
 //     var dat = []
 //     data.forEach(function(d) {
@@ -606,7 +607,7 @@ data.forEach(function(d) {
                 if (test == player) {
                   var dat = [{"weekday":"Monday", "checkins":Number(d.Monday)}, {"weekday":"Tuesday", "checkins":Number(d.Tuesday)},{"weekday":"Wednesday", "checkins":Number(d.Wednesday)},{"weekday":"Thursday", "checkins":Number(d.Thursday)},{"weekday":"Friday", "checkins": Number(d.Friday)}, {"weekday":"Saturday", "checkins":Number(d.Saturday)},{"weekday":"Sunday", "checkins":Number(d.Sunday)}]
                   console.log(dat)
-                  var margin = {top: 20, right: 20, bottom: 50, left: 70},
+                  var margin = {top: 60, right: 30, bottom: 50, left: 70},
 width = 600//960 - margin.left - margin.right,
 height = 400//500 - margin.top - margin.bottom;
                     var svg = d3.select("#charts").append("svg").attr("class", "checkins").style("display", "inline").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -651,7 +652,7 @@ height = 400//500 - margin.top - margin.bottom;
 function createTornadoChart(business_id) {
 
   //var margin = {top: 50, right: 30, bottom: 60, left: 200},
-  var margin = {top: 20, right: 20, bottom: 50, left: 70},
+  var margin = {top: 20, right: 40, bottom: 50, left: 70},
    // width = 800 - margin.left - margin.right,
    // height = 600 - margin.top - margin.bottom;
     width = 1080 - margin.left - margin.right,
