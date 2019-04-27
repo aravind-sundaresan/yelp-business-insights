@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<style>
+
+.bar { fill: #34cbcb; }
+
+.line {
+    fill: none;
+    stroke: #34cbcb;
+    stroke-width: 3;
+}
+
+/* Style the dots by assigning a fill and stroke */
+.dot {
+    fill: #34cbcb;
+    stroke: #fff;
+}
+
+</style>
+
+    <head>
+        <title>Yelp</title>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet-src.js" type="text/javascript"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <script src="yelp.js" type="text/javascript"></script>
+    </head>
+    <body>
+      <h1 align = "center"> Yelp Business Insights</h1>
+      <h3 align="center"><i> Visualization of the Restaurant Growth Trends using Yelp Dataset</i></h3>
+      <br/>
+        <h3 align="center">Select Your Restaurant</h3>
+        <div id="map" align="center"></div>
+        <div id="neighborhood" align="center">
+          <h2> Neighborhood Analysis </h2>
+        <div id="countRating"></div>
+        <div id="cuisine"></div>
+        </div>
+        <div id="charts" align="center"><h2> Restaurant Performance Analysis</h2><br/></div>
+        <div id="sentiment" align="center">
+          <h2> Customer Sentiment Analysis </h2><br/>
+        <div id="tornado" align="center"></div>
+        <div id="gauge" align="center">
+
+          <span>
+            <svg id="fillgauge2" width="19%" height="300" onclick="gauge2.update(NewValue());"><text x="120" y ="295">Bleh</text></svg>
+          </span>
+          <span>
+            <svg id="fillgauge3" width="19%" height="300" onclick="gauge3.update(NewValue());"><text x="97" y ="295">Neutral</text></svg>
+          </span>
+          <span>
+            <svg id="fillgauge4" width="19%" height="300" onclick="gauge4.update(NewValue());"><text x="97" y ="295">Negative</text></svg>
+          </span>
+      </div>
+    </div>
+    </body>
+</html>
