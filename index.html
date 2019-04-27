@@ -16,6 +16,48 @@
     stroke: #fff;
 }
 
+*, *:before, *:after {
+box-sizing: border-box;
+}
+
+.bubbleText {
+
+text-anchor: middle;
+}
+.stars {
+    cursor: pointer;
+  }
+  .stars:hover .star polygon {
+    fill: #ffd055 !important;
+  }
+  .stars .star {
+    float: left;
+  }
+  .stars .star polygon {
+    fill: #d8d8d8;
+  }
+  .stars .star:hover ~ .star polygon {
+    fill: #d8d8d8 !important;
+  }
+  .stars[data-stars] .star polygon {
+    fill: #ffd055;
+  }
+  .stars[data-stars="1"] .star:nth-child(1) ~ .star polygon {
+    fill: #d8d8d8;
+  }
+  .stars[data-stars="2"] .star:nth-child(2) ~ .star polygon {
+    fill: #d8d8d8;
+  }
+  .stars[data-stars="3"] .star:nth-child(3) ~ .star polygon {
+    fill: #d8d8d8;
+  }
+  .stars[data-stars="4"] .star:nth-child(4) ~ .star polygon {
+    fill: #d8d8d8;
+  }
+  .stars[data-stars="5"] .star:nth-child(5) ~ .star polygon {
+    fill: #d8d8d8;
+  }
+
 </style>
 
     <head>
@@ -33,29 +75,43 @@
       <h1 align = "center"> Yelp Business Insights</h1>
       <h3 align="center"><i> Visualization of the Restaurant Growth Trends using Yelp Dataset</i></h3>
       <br/>
-        <h3 align="center">Select Your Restaurant</h3>
+        <h4>Please select your restaurant:</h4>
         <div id="map" align="center"></div>
         <div id="neighborhood" align="center">
-          <h2> Neighborhood Analysis </h2>
+        <h2> NEIGHBORHOOD ANALYSIS </h2>
         <div id="countRating"></div>
         <div id="cuisine"></div>
         </div>
-        <div id="charts" align="center"><h2> Restaurant Performance Analysis</h2><br/></div>
-        <div id="sentiment" align="center">
-          <h2> Customer Sentiment Analysis </h2><br/>
-        <div id="tornado" align="center"></div>
-        <div id="gauge" align="center">
 
-          <span>
-            <svg id="fillgauge2" width="19%" height="300" onclick="gauge2.update(NewValue());"><text x="120" y ="295">Bleh</text></svg>
-          </span>
-          <span>
-            <svg id="fillgauge3" width="19%" height="300" onclick="gauge3.update(NewValue());"><text x="97" y ="295">Neutral</text></svg>
-          </span>
-          <span>
-            <svg id="fillgauge4" width="19%" height="300" onclick="gauge4.update(NewValue());"><text x="97" y ="295">Negative</text></svg>
-          </span>
-      </div>
+        <br /><br />
+        <div id="charts" align="center"><h2> RESTAURANT PERFORMANCE ANALYSIS</h2><br/></div>
+
+        <div id="sentiment" align="center">
+          <h2> CUSTOMER SENTIMENT ANALYSIS </h2><br/><br/>
+
+        Please select the Star rating to generate the Word Bubble<div id="stars" class="stars"  data-stars="2">
+            <div class="starts"></div>
+        </div>
+
+
+        <div id="word-bubble" align="center"></div><br /><br />
+
+          <div id="gauge" align="center" width="50%">
+            <h4 style="font-size: 18px"><u>Sentiment Split across Customer Reviews</u></h4>
+            <span class="fillgauge4">
+              <svg id="fillgauge4" width="10%" height="400" onclick="gauge4.update(NewValue());"></svg>
+            </span>
+            <span class="fillgauge3">
+
+              <svg id="fillgauge3" width="10%" height="400" onclick="gauge3.update(NewValue());"></svg>
+            </span>
+            <span class="fillgauge2">
+              <svg id="fillgauge2" width="10%" height="400" onclick="gauge2.update(NewValue());"></svg>
+            </span>
+          </div>
+        <br />
+        <br /><br />
+          <div id="tornado" align="center"></div>
     </div>
     </body>
 </html>

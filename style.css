@@ -1,7 +1,7 @@
  @import url(http://fonts.googleapis.com/css?family=Roboto:400,600);
  #map {
-  width: 781px;
-  height: 460px;
+  width: window.innerWidth;
+  height: 550px;
   }
 
 .bar { fill: #34cbcb; }
@@ -10,17 +10,17 @@
   fill: #ff8080;
 }
 
-div.tooltip {	
-    position: absolute;			
-    text-align: center;			
-    width: 110px;					
-    height: 30px;					
-    padding: 2px;				
-    font: 10px sans-serif;		
-    background: #d6f5f5;	
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 110px;
+    height: 30px;
+    padding: 2px;
+    font: 10px sans-serif;
+    background: #d6f5f5;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
 }
 
 body{

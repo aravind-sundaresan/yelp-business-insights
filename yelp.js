@@ -1,8 +1,30 @@
 init();
 
 function init() {
+    loadCSV();
     fetchData();
 }
+
+var data1 = [];
+   var flag = true;
+   function loadCSV(){
+           d3.csv('word_bubble_data.csv', function(error, data) {
+        if (error) throw error;
+        //console.log(data[0])
+        data.forEach(function(d){
+         console.log("Hi")
+             var dd = {"business_id": d.business_id, "stars": Number(d.stars), "keys": (d.keys), "dict":(d.dict)}
+             data1.push(dd)});
+      });
+
+   };
+
+   function insertTitles(){
+         document.getElementById("neighborhood").append("<h2>NEIGHBORHOOD ANALYSIS</h2>");
+         document.getElementById("charts").append("<h2>RESTAURANT PERFORMANCE ANALYSIS</h2>");
+         document.getElementById("gauge").append("<h4><u>Sentiment Split across Customer Reviews</u></h4>");
+         document.getElementById("sentiment").append("<h2>CUSTOMER SENTIMENT ANALYSIS</h2><br/><br/><p>Please Select the Star Rating to generate the word bubble.</p>");
+       }
 
 function fetchData() {
     d3.csv("restaurants.csv", function(error, data) {
@@ -12,26 +34,29 @@ function fetchData() {
         })
         restaurantData = data;
         createMap(restaurantData);
-        createCuisinesChart(restaurantData);
-        createCharts();
+        // createCuisinesChart(restaurantData);
+        // createCharts();
 
         //Creating the tornado chart
-        var tornado_data = d3.json("word_semantic_strength_top10_New_2.json",function(error,tornado_data){
-          tornado_data.forEach(function(d)
-          {
-            console.log("tornado")
-            if (d["id"] == test)
-            {
+        // var tornado_data = d3.json("word_semantic_strength_top10_New_2.json",function(error,tornado_data){
+        //   tornado_data.forEach(function(d)
+        //   {
+        //     console.log("tornado")
+        //     if (d["id"] == test)
+        //     {
+        //
+        //       var chart = createTornadoChart(test)
+        //       console.log("Tornado")
+        //       d3.select("#tornado")
+        //       .datum(d["words"])
+        //       .call(chart);
+        //     }
+        //   }
+        //   );
+        // });
+        // createWordBubble("28hruDLwF_5s0QtDWH4rpg");
+        // drawGaugeChart("-0WegMt6Cy966qlDKhu6jA")
 
-              var chart = createTornadoChart(test)
-              console.log("Tornado")
-              d3.select("#tornado")
-              .datum(d["words"])
-              .call(chart);
-            }
-          }
-          );
-        });
     });
 };
 var test;
@@ -75,7 +100,7 @@ function createMap(data) {
             inRangeRestaurants.push(location);
         }
     });
-    createRatingsChart(inRangeRestaurants);
+    //createRatingsChart(inRangeRestaurants);
     for (var i = 0; i < restaurants.length; i += 1) {
 
         L.circleMarker([restaurants[i]["latitude"], restaurants[i]["longitude"]], geojsonMarkerOptions).bindPopup(restaurants[i]["name"], {
@@ -100,15 +125,19 @@ function createMap(data) {
             });
             d3.select(".chart").remove();
             d3.select(".cuisineChart").remove();
-            d3.select(".stars").remove();
             d3.select(".checkins").remove();
             d3.select(".reviews").remove();
             d3.select(".rating").remove();
             d3.select(".ratings").remove();
             d3.select(".tornado").remove();
+
+            insertTitles();
+
             createRatingsChart(inRangeRestaurants);
             createCuisinesChart(inRangeRestaurants);
             createCharts();
+            createWordBubble(test);
+            drawGaugeChart(test);
 
             //Creating the tornado chart
             var tornado_data = d3.json("word_semantic_strength_top10_New_2.json",function(error,tornado_data){
@@ -127,25 +156,7 @@ function createMap(data) {
               }
               );
             });
-            //Creating the tornado chart
-            /*var data = d3.json("word_semantic_strength_top10_New_2.json",function(error,data){
-              data.forEach(function(d)
-              {
 
-                if (d["id"] == test)
-                {
-
-                  var chart = createTornadoChart(test)
-                  console.log("Tornado")
-                  d3.select("#tornado")
-                  .datum(d["words"])
-                  .call(chart);
-                }
-              }
-              );
-            });*/
-
-            //drawGaugeChart(test);
         });
     }
 }
@@ -187,7 +198,7 @@ function createRatingsChart(data) {
             }
         })
     });
-    var margin = {top: 100, right: 20, bottom: 50, left: 70},
+    var margin = {top: 20, right: 20, bottom: 50, left: 70},
     width = 600,//960 - margin.left - margin.right,
     height = 380//500 - margin.top - margin.bottom;
     // set the ranges
@@ -201,9 +212,9 @@ function createRatingsChart(data) {
         return d.count+5;
     })]);
 
-    var div = d3.select("body").append("div") 
-    .attr("class", "tooltip")       
-    .style("opacity", 0);
+    var div = d3.select("body").append("div")
+              .attr("class", "tooltip")
+              .style("opacity", 0);
 
     svg.selectAll(".bar").data(ratingCount).enter().append("rect").attr("class", "bar").attr("x", function(d) {
         return x(d.rating);
@@ -212,22 +223,22 @@ function createRatingsChart(data) {
     }).attr("height", function(d) {
         return height - y(d.count);
     })
-    .on ("mouseover", function(d) { 
+    .on ("mouseover", function(d) {
             var matrix = this.getScreenCTM()
                 .translate(+ this.getAttribute("x"), + this.getAttribute("y"));
             div.style("height", "20px")
             div.style("width", "60px")
-            div.transition()    
-                .duration(200)    
+            div.transition()
+                .duration(200)
                 .style("opacity", 1);
-            div.html("Count:" + d.count) 
-                .style("left", (window.pageXOffset + matrix.e) + "px")   
-                .style("top", (window.pageYOffset + matrix.f - 30) + "px");  
-            })          
-    .on("mouseout", function(d) {   
-            div.transition()    
-                .duration(500)    
-                .style("opacity", 0); 
+            div.html("Count:" + d.count)
+                .style("left", (window.pageXOffset + matrix.e) + "px")
+                .style("top", (window.pageYOffset + matrix.f - 30) + "px");
+            })
+    .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
         });
 
     svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
@@ -249,11 +260,9 @@ function createRatingsChart(data) {
         .attr("x", (width / 2))
         .attr("y", 20 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "18px")
         .style("text-decoration", "underline")
-        .text("Star Distribution of Neighborhood Businesses");
-
-
+        .text("Distribution of Star ratings in Neighborhood Businesses");
 }
 
 function createCuisinesChart(data) {
@@ -291,7 +300,7 @@ function createCuisinesChart(data) {
             }
         });
     });
-    var margin = {top: 130, right: 35, bottom: 50, left: 70},
+    var margin = {top: 20, right: 20, bottom: 50, left: 70},
     width = 550//960 - margin.left - margin.right,
     height = 350//500 - margin.top - margin.bottom;
     var svg = d3.select("#cuisine").style("display", "inline").style("width", "50%").append("svg").attr("class", "cuisineChart").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -322,9 +331,9 @@ function createCuisinesChart(data) {
         .attr("x", (width / 2))
         .attr("y", 5 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "18px")
         .style("text-decoration", "underline")
-        .text("Categories and count of restaurant in each category");
+        .text("Distribution of Neighboring Restaurants based on Cuisines");
 
 }
 function createCharts(){
@@ -341,7 +350,7 @@ d3.csv("ratings_and_reviews_yearwise.csv", function(data1) {
     }
     });
     console.log(dat)
-var margin = {top: 120, right: 20, bottom: 50, left: 70},
+var margin = {top: 20, right: 20, bottom: 50, left: 70},
     width = 600//960 - margin.left - margin.right,
     height = 400//500 - margin.top - margin.bottom;
 
@@ -397,9 +406,9 @@ svg.append("text")
         .attr("x", (width / 2))
         .attr("y", 5 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "18px")
         .style("text-decoration", "underline")
-        .text("Annual Average Rating Variation.");
+        .text("Annual Average Rating of the Restaurant");
 
 
 // 9. Append the path, bind the data, and call the line generator
@@ -408,40 +417,39 @@ svg.append("path")
     .attr("class", "line") // Assign a class for styling
     .attr("d", line); // 11. Calls the line generator
 
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
-var div = d3.select("body").append("div") 
-    .attr("class", "tooltip")       
-    .style("opacity", 0);
+        // 12. Appends a circle for each datapoint
+        svg.selectAll(".dot")
+            .data(dat)
+            .enter().append("circle") // Uses the enter().append() method
+            .attr("class", "dot") // Assign a class for styling
+            .attr("cx", function(d) { return xScale(d.year) })
+            .attr("cy", function(d) { return yScale(d.rating) })
+            .attr("r", 5)
+            .on("mouseover", function(d) {
 
-// 12. Appends a circle for each datapoint
-svg.selectAll(".dot")
-    .data(dat)
-    .enter().append("circle") // Uses the enter().append() method
-    .attr("class", "dot") // Assign a class for styling
-    .attr("cx", function(d) { return xScale(d.year) })
-    .attr("cy", function(d) { return yScale(d.rating) })
-    .attr("r", 5)
-    .on("mouseover", function(d) {
+              var matrix = this.getScreenCTM()
+                        .translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
 
-      var matrix = this.getScreenCTM()
-                .translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
-      
-      
-      div.transition()    
-                .duration(200)    
-                .style("opacity", 1);    
-      div.html("Average Rating: " + Math.round(d.rating * 100) / 100 + '<br/>' + "Year: " + d.year.getFullYear()) 
-                .style("left", (window.pageXOffset + matrix.e - 55) + "px")   
-                .style("top", (window.pageYOffset + matrix.f - 45) + "px");
-      console.log(d.rating);
-     d3.select(this).attr("r", 10)
 
-    }).on("mouseout", function(d) {
-      div.transition()    
-                .duration(500)    
-                .style("opacity", 0);
-      d3.select(this).attr("r", 5)
-    });
+              div.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+              div.html("Average Rating: " + Math.round(d.rating * 100) / 100)
+                        .style("left", (window.pageXOffset + matrix.e - 55) + "px")
+                        .style("top", (window.pageYOffset + matrix.f - 45) + "px");
+              console.log(d.rating);
+             d3.select(this).attr("r", 10)
+
+            }).on("mouseout", function(d) {
+              div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+              d3.select(this).attr("r", 5)
+            });
 
 var x = d3.scaleBand()
           .range([0, width])
@@ -466,6 +474,11 @@ var parseDate = d3.timeParse("%Y");
   x.domain(dat.map(function(d) { return d.year; }));
   y.domain([0, d3.max(dat, function(d) { return d.reviews; })]);
 
+
+      var div = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
   // append the rectangles for the bar chart
   svg.selectAll(".bar")
       .data(dat)
@@ -474,7 +487,24 @@ var parseDate = d3.timeParse("%Y");
       .attr("x", function(d) { return x(d.year); })
       .attr("width", x.bandwidth())
       .attr("y", function(d) { return y(d.reviews); })
-      .attr("height", function(d) { return height - y(d.reviews); });
+      .attr("height", function(d) { return height - y(d.reviews); })
+      .on ("mouseover", function(d) {
+            var matrix = this.getScreenCTM()
+                .translate(+ this.getAttribute("x"), + this.getAttribute("y"));
+            div.style("height", "20px")
+            div.style("width", "60px")
+            div.transition()
+                .duration(200)
+                .style("opacity", 1);
+            div.html("Count:" + d.reviews)
+                .style("left", (window.pageXOffset + matrix.e) + "px")
+                .style("top", (window.pageYOffset + matrix.f - 30) + "px");
+            })
+    .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
   // add the x Axis
   svg.append("text")
@@ -499,58 +529,58 @@ svg.append("text")
         .attr("x", (width / 2))
         .attr("y", 5 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "18px")
         .style("text-decoration", "underline")
-        .text("Total Number of Reviews Annually.");
+        .text("Annual Number of Reviews");
   svg.append("g")
       .call(d3.axisLeft(y));
   });
 
-d3.csv("starwise_count.csv", function(data) {
-    var dat = []
-    data.forEach(function(d) {
-                    var player = d.business_id;
-                    if (test == player) {
-                      var da = {"stars":Number(d.stars), "count":Number(d.star_count)};
-                      dat.push(da)}});
-                      console.log(dat)
-                      dat.reverse();
-                      var margin = {top: 120, right: 20, bottom: 50, left: 70},
-    width = 600//960 - margin.left - margin.right,
-    height = 400//500 - margin.top - margin.bottom;
-    var svg = d3.select("#charts").append("svg").attr("class", "stars").style("display", "inline").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var x = d3.scaleLinear().range([0, width]).domain([0, d3.max(dat, function(d) {
-        return d.count+5;
-    })]);
-    var y = d3.scaleBand().rangeRound([0, height]).padding(0.1).domain(dat.map(function(d) {
-        return d.stars;
-    }));
-    var xAxis = d3.axisBottom().scale(x);
-    var yAxis = d3.axisLeft().scale(y);
-    var gy = svg.append("g").attr("class", "y axis").call(yAxis)
-    var bars = svg.selectAll(".bar").data(dat).enter().append("g")
-    //append rects
-    bars.append("rect").attr("class", "bar").attr("y", function(d) {
-        return y(d.stars);
-    }).attr("height", y.bandwidth()).attr("x", 0).attr("width", function(d) {
-        return x(d.count);
-    });
-    bars.append("text").attr("class", "label").attr("y", function(d) {
-        return y(d.stars) + y.bandwidth() / 2 + 4;
-    }).attr("x", function(d) {
-        return x(d.count) + 3;
-    }).text(function(d) {
-        return d.count;
-    });
-svg.append("text")
-        .attr("x", (width / 2))
-        .attr("y", 5 - (margin.top / 2))
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .style("text-decoration", "underline")
-        .text("Total number of reviews for each rating");
-                                          }
-);
+// d3.csv("starwise_count.csv", function(data) {
+//     var dat = []
+//     data.forEach(function(d) {
+//                     var player = d.business_id;
+//                     if (test == player) {
+//                       var da = {"stars":Number(d.stars), "count":Number(d.star_count)};
+//                       dat.push(da)}});
+//                       console.log(dat)
+//                       dat.reverse();
+//                       var margin = {top: 20, right: 20, bottom: 50, left: 70},
+//     width = 600//960 - margin.left - margin.right,
+//     height = 400//500 - margin.top - margin.bottom;
+//     var svg = d3.select("#charts").append("svg").attr("class", "stars").style("display", "inline").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//     var x = d3.scaleLinear().range([0, width]).domain([0, d3.max(dat, function(d) {
+//         return d.count+5;
+//     })]);
+//     var y = d3.scaleBand().rangeRound([0, height]).padding(0.1).domain(dat.map(function(d) {
+//         return d.stars;
+//     }));
+//     var xAxis = d3.axisBottom().scale(x);
+//     var yAxis = d3.axisLeft().scale(y);
+//     var gy = svg.append("g").attr("class", "y axis").call(yAxis)
+//     var bars = svg.selectAll(".bar").data(dat).enter().append("g")
+//     //append rects
+//     bars.append("rect").attr("class", "bar").attr("y", function(d) {
+//         return y(d.stars);
+//     }).attr("height", y.bandwidth()).attr("x", 0).attr("width", function(d) {
+//         return x(d.count);
+//     });
+//     bars.append("text").attr("class", "label").attr("y", function(d) {
+//         return y(d.stars) + y.bandwidth() / 2 + 4;
+//     }).attr("x", function(d) {
+//         return x(d.count) + 3;
+//     }).text(function(d) {
+//         return d.count;
+//     });
+// svg.append("text")
+//         .attr("x", (width / 2))
+//         .attr("y", 5 - (margin.top / 2))
+//         .attr("text-anchor", "middle")
+//         .style("font-size", "18px")
+//         .style("text-decoration", "underline")
+//         .text("Total number of reviews for each rating");
+//                                           }
+// );
 
 
 d3.csv("final.csv", function(data) {
@@ -559,7 +589,7 @@ data.forEach(function(d) {
                 if (test == player) {
                   var dat = [{"weekday":"Monday", "checkins":Number(d.Monday)}, {"weekday":"Tuesday", "checkins":Number(d.Tuesday)},{"weekday":"Wednesday", "checkins":Number(d.Wednesday)},{"weekday":"Thursday", "checkins":Number(d.Thursday)},{"weekday":"Friday", "checkins": Number(d.Friday)}, {"weekday":"Saturday", "checkins":Number(d.Saturday)},{"weekday":"Sunday", "checkins":Number(d.Sunday)}]
                   console.log(dat)
-                  var margin = {top: 120, right: 20, bottom: 50, left: 70},
+                  var margin = {top: 20, right: 20, bottom: 50, left: 70},
 width = 600//960 - margin.left - margin.right,
 height = 400//500 - margin.top - margin.bottom;
                     var svg = d3.select("#charts").append("svg").attr("class", "checkins").style("display", "inline").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -590,7 +620,7 @@ height = 400//500 - margin.top - margin.bottom;
     .attr("x", (width / 2))
     .attr("y", 5 - (margin.top / 2))
     .attr("text-anchor", "middle")
-    .style("font-size", "16px")
+    .style("font-size", "18px")
     .style("text-decoration", "underline")
     .text("Weekly Check-In Distribution.");
 
@@ -637,7 +667,7 @@ function createTornadoChart(business_id) {
     selection.each(function(data) {
 
       x.domain(d3.extent(data, function(d) { return d.score; })).nice();
-      //x.domain(d3.scale.linear().domain([0,5]));
+      //x.domain(d3.scaleLinear().domain([0,5]));
       //x.domain([-1,1]);
       y.domain(data.map(function(d) { return d.word; }));
 
@@ -718,7 +748,7 @@ function createTornadoChart(business_id) {
           .attr("y", 0)
           //.attr("dy", ".35em")
           .attr("text-anchor", "middle")
-          .style("font-size", "16px")
+          .style("font-size", "18px")
           .style("text-decoration", "underline")
           .text("Most Positive and Negative Keywords in Reviews")
   }
@@ -730,323 +760,501 @@ function createTornadoChart(business_id) {
 
 // ************************* Gauge Chart *************************
 
-// function drawGaugeChart(business_id) {
-//
-//
-//   d3.csv("review_count_per_sentiment.csv", function(error, data) {
-//
-//     var positive = 0;
-//     var negative = 0;
-//     var neutral = 0;
-//
-//     data.forEach(function(d) {
-//       if (d.business_id === business_id) {
-//         positive = parseInt(d.positive_review_count)
-//         negative = parseInt(d.negative_review_count)
-//         neutral = parseInt(d.neutral_review_count)
-//       }
-//     });
-//
-//     total = positive + negative + neutral
-//
-//     var config1 = liquidFillGaugeDefaultSettings();
-//     config1.circleColor = "#34cbcb";
-//     config1.textColor = "#34cbcb";
-//     config1.waveTextColor = "#D2F3F3";
-//     config1.waveColor = "#34cbcb";
-//     config1.circleThickness = 0.1;
-//     config1.textVertPosition = 0.5;
-//     config1.waveAnimateTime = 0;
-//     var gauge1 = loadLiquidFillGauge("fillgauge2", (positive / total) * 100, config1);
-//     var config1 = liquidFillGaugeDefaultSettings();
-//     config1.circleColor = "#FF8080";
-//     config1.textColor = "#FF8080";
-//     config1.waveTextColor = "#FFDDDD";
-//     config1.waveColor = "#FF8080";
-//     config1.circleThickness = 0.1;
-//     config1.textVertPosition = 0.5;
-//     config1.waveAnimateTime = 0;
-//     var gauge2 = loadLiquidFillGauge("fillgauge4", (neutral / total) * 100, config1);
-//     var config2 = liquidFillGaugeDefaultSettings();
-//     config2.circleColor = "#C2C9D1";
-//     config2.textColor = "#C2C9D1";
-//     config2.waveTextColor = "#E3E8ED";
-//     config2.waveColor = "#C2C9D1";
-//     config2.circleThickness = 0.1;
-//     config2.textVertPosition = 0.5;
-//     config2.waveAnimateTime = 0;
-//     var gauge3 = loadLiquidFillGauge("fillgauge3", (negative / total) * 100, config2);
-//
-//     function NewValue(){
-//         if(Math.random() > .5){
-//             return Math.round(Math.random()*100);
-//         } else {
-//             return (Math.random()*100).toFixed(1);
-//         }
-//     }
-//   });
-// };
-//
-// function liquidFillGaugeDefaultSettings(){
-//     return {
-//         minValue: 0, // The gauge minimum value.
-//         maxValue: 100, // The gauge maximum value.
-//         circleThickness: 0.05, // The outer circle thickness as a percentage of it's radius.
-//         circleFillGap: 0.05, // The size of the gap between the outer circle and wave circle as a percentage of the outer circles radius.
-//         circleColor: "#178BCA", // The color of the outer circle.
-//         waveHeight: 0.05, // The wave height as a percentage of the radius of the wave circle.
-//         waveCount: 1, // The number of full waves per width of the wave circle.
-//         waveRiseTime: 1000, // The amount of time in milliseconds for the wave to rise from 0 to it's final height.
-//         waveAnimateTime: 18000, // The amount of time in milliseconds for a full wave to enter the wave circle.
-//         waveRise: true, // Control if the wave should rise from 0 to it's full height, or start at it's full height.
-//         waveHeightScaling: true, // Controls wave size scaling at low and high fill percentages. When true, wave height reaches it's maximum at 50% fill, and minimum at 0% and 100% fill. This helps to prevent the wave from making the wave circle from appear totally full or empty when near it's minimum or maximum fill.
-//         waveAnimate: true, // Controls if the wave scrolls or is static.
-//         waveColor: "#178BCA", // The color of the fill wave.
-//         waveOffset: 0, // The amount to initially offset the wave. 0 = no offset. 1 = offset of one full wave.
-//         textVertPosition: .5, // The height at which to display the percentage text withing the wave circle. 0 = bottom, 1 = top.
-//         textSize: 1, // The relative height of the text to display in the wave circle. 1 = 50%
-//         valueCountUp: true, // If true, the displayed value counts up from 0 to it's final value upon loading. If false, the final value is displayed.
-//         displayPercent: true, // If true, a % symbol is displayed after the value.
-//         textColor: "#045681", // The color of the value text when the wave does not overlap it.
-//         waveTextColor: "#A4DBf8" // The color of the value text when the wave overlaps it.
-//     };
-// }
-//
-// function loadLiquidFillGauge(elementId, value, config) {
-//     if(config == null) config = liquidFillGaugeDefaultSettings();
-//
-//     var gauge = d3.select("#" + elementId);
-//     var radius = Math.min(parseInt(gauge.style("width")), parseInt(gauge.style("height")))/2;
-//     var locationX = parseInt(gauge.style("width"))/2 - radius;
-//     var locationY = parseInt(gauge.style("height"))/2 - radius;
-//     var fillPercent = Math.max(config.minValue, Math.min(config.maxValue, value))/config.maxValue;
-//
-//     var waveHeightScale;
-//     if(config.waveHeightScaling){
-//         waveHeightScale = d3.scale.linear()
-//             .range([0,config.waveHeight,0])
-//             .domain([0,50,100]);
-//     } else {
-//         waveHeightScale = d3.scale.linear()
-//             .range([config.waveHeight,config.waveHeight])
-//             .domain([0,100]);
-//     }
-//
-//     var textPixels = (config.textSize*radius/2);
-//     var textFinalValue = parseFloat(value).toFixed(2);
-//     var textStartValue = config.valueCountUp?config.minValue:textFinalValue;
-//     var percentText = config.displayPercent?"%":"";
-//     var circleThickness = config.circleThickness * radius;
-//     var circleFillGap = config.circleFillGap * radius;
-//     var fillCircleMargin = circleThickness + circleFillGap;
-//     var fillCircleRadius = radius - fillCircleMargin;
-//     var waveHeight = fillCircleRadius*waveHeightScale(fillPercent*100);
-//
-//     var waveLength = fillCircleRadius*2/config.waveCount;
-//     var waveClipCount = 1+config.waveCount;
-//     var waveClipWidth = waveLength*waveClipCount;
-//
-//     // Rounding functions so that the correct number of decimal places is always displayed as the value counts up.
-//     var textRounder = function(value){ return Math.round(value); };
-//     if(parseFloat(textFinalValue) != parseFloat(textRounder(textFinalValue))){
-//         textRounder = function(value){ return parseFloat(value).toFixed(1); };
-//     }
-//     if(parseFloat(textFinalValue) != parseFloat(textRounder(textFinalValue))){
-//         textRounder = function(value){ return parseFloat(value).toFixed(2); };
-//     }
-//
-//     // Data for building the clip wave area.
-//     var data = [];
-//     for(var i = 0; i <= 40*waveClipCount; i++){
-//         data.push({x: i/(40*waveClipCount), y: (i/(40))});
-//     }
-//
-//     // Scales for drawing the outer circle.
-//     var gaugeCircleX = d3.scale.linear().range([0,2*Math.PI]).domain([0,1]);
-//     var gaugeCircleY = d3.scale.linear().range([0,radius]).domain([0,radius]);
-//
-//     // Scales for controlling the size of the clipping path.
-//     var waveScaleX = d3.scale.linear().range([0,waveClipWidth]).domain([0,1]);
-//     var waveScaleY = d3.scale.linear().range([0,waveHeight]).domain([0,1]);
-//
-//     // Scales for controlling the position of the clipping path.
-//     var waveRiseScale = d3.scale.linear()
-//         // The clipping area size is the height of the fill circle + the wave height, so we position the clip wave
-//         // such that the it will overlap the fill circle at all when at 0%, and will totally cover the fill
-//         // circle at 100%.
-//         .range([(fillCircleMargin+fillCircleRadius*2+waveHeight),(fillCircleMargin-waveHeight)])
-//         .domain([0,1]);
-//     var waveAnimateScale = d3.scale.linear()
-//         .range([0, waveClipWidth-fillCircleRadius*2]) // Push the clip area one full wave then snap back.
-//         .domain([0,1]);
-//
-//     // Scale for controlling the position of the text within the gauge.
-//     var textRiseScaleY = d3.scale.linear()
-//         .range([fillCircleMargin+fillCircleRadius*2,(fillCircleMargin+textPixels*0.7)])
-//         .domain([0,1]);
-//
-//     // Center the gauge within the parent SVG.
-//     var gaugeGroup = gauge.append("g")
-//         .attr('transform','translate('+locationX+','+locationY+')');
-//
-//     // Draw the outer circle.
-//     var gaugeCircleArc = d3.svg.arc()
-//         .startAngle(gaugeCircleX(0))
-//         .endAngle(gaugeCircleX(1))
-//         .outerRadius(gaugeCircleY(radius))
-//         .innerRadius(gaugeCircleY(radius-circleThickness));
-//     gaugeGroup.append("path")
-//         .attr("d", gaugeCircleArc)
-//         .style("fill", config.circleColor)
-//         .attr('transform','translate('+radius+','+radius+')');
-//
-//     // Text where the wave does not overlap.
-//     var text1 = gaugeGroup.append("text")
-//         .text(textRounder(textStartValue) + percentText)
-//         .attr("class", "liquidFillGaugeText")
-//         .attr("text-anchor", "middle")
-//         .attr("font-size", textPixels + "px")
-//         .style("fill", config.textColor)
-//         .attr('transform','translate('+radius+','+textRiseScaleY(config.textVertPosition)+')');
-//
-//     // The clipping wave area.
-//     var clipArea = d3.svg.area()
-//         .x(function(d) { return waveScaleX(d.x); } )
-//         .y0(function(d) { return waveScaleY(Math.sin(Math.PI*2*config.waveOffset*-1 + Math.PI*2*(1-config.waveCount) + d.y*2*Math.PI));} )
-//         .y1(function(d) { return (fillCircleRadius*2 + waveHeight); } );
-//     var waveGroup = gaugeGroup.append("defs")
-//         .append("clipPath")
-//         .attr("id", "clipWave" + elementId);
-//     var wave = waveGroup.append("path")
-//         .datum(data)
-//         .attr("d", clipArea)
-//         .attr("T", 0);
-//
-//     // The inner circle with the clipping wave attached.
-//     var fillCircleGroup = gaugeGroup.append("g")
-//         .attr("clip-path", "url(#clipWave" + elementId + ")");
-//     fillCircleGroup.append("circle")
-//         .attr("cx", radius)
-//         .attr("cy", radius)
-//         .attr("r", fillCircleRadius)
-//         .style("fill", config.waveColor);
-//
-//     // Text where the wave does overlap.
-//     var text2 = fillCircleGroup.append("text")
-//         .text(textRounder(textStartValue) + percentText)
-//         .attr("class", "liquidFillGaugeText")
-//         .attr("text-anchor", "middle")
-//         .attr("font-size", textPixels + "px")
-//         .style("fill", config.waveTextColor)
-//         .attr('transform','translate('+radius+','+textRiseScaleY(config.textVertPosition)+')');
-//
-//     // Make the value count up.
-//     if(config.valueCountUp){
-//         var textTween = function(){
-//             var i = d3.interpolate(this.textContent, textFinalValue);
-//             return function(t) { this.textContent = textRounder(i(t)) + percentText; }
-//         };
-//         text1.transition()
-//             .duration(config.waveRiseTime)
-//             .tween("text", textTween);
-//         text2.transition()
-//             .duration(config.waveRiseTime)
-//             .tween("text", textTween);
-//     }
-//
-//     // Make the wave rise. wave and waveGroup are separate so that horizontal and vertical movement can be controlled independently.
-//     var waveGroupXPosition = fillCircleMargin+fillCircleRadius*2-waveClipWidth;
-//     if(config.waveRise){
-//         waveGroup.attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(0)+')')
-//             .transition()
-//             .duration(config.waveRiseTime)
-//             .attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(fillPercent)+')')
-//             .each("start", function(){ wave.attr('transform','translate(1,0)'); }); // This transform is necessary to get the clip wave positioned correctly when waveRise=true and waveAnimate=false. The wave will not position correctly without this, but it's not clear why this is actually necessary.
-//     } else {
-//         waveGroup.attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(fillPercent)+')');
-//     }
-//
-//     if(config.waveAnimate) animateWave();
-//
-//     function animateWave() {
-//         wave.attr('transform','translate('+waveAnimateScale(wave.attr('T'))+',0)');
-//         wave.transition()
-//             .duration(config.waveAnimateTime * (1-wave.attr('T')))
-//             .ease('linear')
-//             .attr('transform','translate('+waveAnimateScale(1)+',0)')
-//             .attr('T', 1)
-//             .each('end', function(){
-//                 wave.attr('T', 0);
-//                 animateWave(config.waveAnimateTime);
-//             });
-//     }
-//
-//     function GaugeUpdater(){
-//         this.update = function(value){
-//             var newFinalValue = parseFloat(value).toFixed(2);
-//             var textRounderUpdater = function(value){ return Math.round(value); };
-//             if(parseFloat(newFinalValue) != parseFloat(textRounderUpdater(newFinalValue))){
-//                 textRounderUpdater = function(value){ return parseFloat(value).toFixed(1); };
-//             }
-//             if(parseFloat(newFinalValue) != parseFloat(textRounderUpdater(newFinalValue))){
-//                 textRounderUpdater = function(value){ return parseFloat(value).toFixed(2); };
-//             }
-//
-//             var textTween = function(){
-//                 var i = d3.interpolate(this.textContent, parseFloat(value).toFixed(2));
-//                 return function(t) { this.textContent = textRounderUpdater(i(t)) + percentText; }
-//             };
-//
-//             text1.transition()
-//                 .duration(config.waveRiseTime)
-//                 .tween("text", textTween);
-//             text2.transition()
-//                 .duration(config.waveRiseTime)
-//                 .tween("text", textTween);
-//
-//             var fillPercent = Math.max(config.minValue, Math.min(config.maxValue, value))/config.maxValue;
-//             var waveHeight = fillCircleRadius*waveHeightScale(fillPercent*100);
-//             var waveRiseScale = d3.scale.linear()
-//                 // The clipping area size is the height of the fill circle + the wave height, so we position the clip wave
-//                 // such that the it will overlap the fill circle at all when at 0%, and will totally cover the fill
-//                 // circle at 100%.
-//                 .range([(fillCircleMargin+fillCircleRadius*2+waveHeight),(fillCircleMargin-waveHeight)])
-//                 .domain([0,1]);
-//             var newHeight = waveRiseScale(fillPercent);
-//             var waveScaleX = d3.scale.linear().range([0,waveClipWidth]).domain([0,1]);
-//             var waveScaleY = d3.scale.linear().range([0,waveHeight]).domain([0,1]);
-//             var newClipArea;
-//             if(config.waveHeightScaling){
-//                 newClipArea = d3.svg.area()
-//                     .x(function(d) { return waveScaleX(d.x); } )
-//                     .y0(function(d) { return waveScaleY(Math.sin(Math.PI*2*config.waveOffset*-1 + Math.PI*2*(1-config.waveCount) + d.y*2*Math.PI));} )
-//                     .y1(function(d) { return (fillCircleRadius*2 + waveHeight); } );
-//             } else {
-//                 newClipArea = clipArea;
-//             }
-//
-//             var newWavePosition = config.waveAnimate?waveAnimateScale(1):0;
-//             wave.transition()
-//                 .duration(0)
-//                 .transition()
-//                 .duration(config.waveAnimate?(config.waveAnimateTime * (1-wave.attr('T'))):(config.waveRiseTime))
-//                 .ease('linear')
-//                 .attr('d', newClipArea)
-//                 .attr('transform','translate('+newWavePosition+',0)')
-//                 .attr('T','1')
-//                 .each("end", function(){
-//                     if(config.waveAnimate){
-//                         wave.attr('transform','translate('+waveAnimateScale(0)+',0)');
-//                         animateWave(config.waveAnimateTime);
-//                     }
-//                 });
-//             waveGroup.transition()
-//                 .duration(config.waveRiseTime)
-//                 .attr('transform','translate('+waveGroupXPosition+','+newHeight+')')
-//         }
-//     }
-//
-//     return new GaugeUpdater();
-// }
-//
+function drawGaugeChart(business_id) {
+
+
+  console.log("Gauge chart")
+  var gaugeData = d3.csv("review_count_per_sentiment.csv", function(error, gaugeData) {
+
+    var positive = 0;
+    var negative = 0;
+    var neutral = 0;
+
+    gaugeData.forEach(function(d) {
+      console.log("Checking")
+      if (d.business_id === business_id) {
+        console.log("Found")
+        positive = parseInt(d.positive_review_count)
+        negative = parseInt(d.negative_review_count)
+        neutral = parseInt(d.neutral_review_count)
+      }
+    });
+
+    total = positive + negative + neutral
+
+    console.log(positive)
+    var config1 = liquidFillGaugeDefaultSettings();
+    config1.circleColor = "#34cbcb";
+    config1.textColor = "#34cbcb";
+    config1.waveTextColor = "#D2F3F3";
+    config1.waveColor = "#34cbcb";
+    config1.circleThickness = 0.1;
+    config1.textVertPosition = 0.5;
+    config1.waveAnimateTime = 0;
+    var gauge1 = loadLiquidFillGauge("fillgauge2", (positive / total) * 100, config1);
+    var config1 = liquidFillGaugeDefaultSettings();
+    config1.circleColor = "#FF8080";
+    config1.textColor = "#FF8080";
+    config1.waveTextColor = "#FFDDDD";
+    config1.waveColor = "#FF8080";
+    config1.circleThickness = 0.1;
+    config1.textVertPosition = 0.5;
+    config1.waveAnimateTime = 0;
+    var gauge2 = loadLiquidFillGauge("fillgauge4", (neutral / total) * 100, config1);
+    var config2 = liquidFillGaugeDefaultSettings();
+    config2.circleColor = "#C2C9D1";
+    config2.textColor = "#C2C9D1";
+    config2.waveTextColor = "#E3E8ED";
+    config2.waveColor = "#C2C9D1";
+    config2.circleThickness = 0.1;
+    config2.textVertPosition = 0.5;
+    config2.waveAnimateTime = 0;
+    var gauge3 = loadLiquidFillGauge("fillgauge3", (negative / total) * 100, config2);
+
+    function NewValue(){
+        if(Math.random() > .5){
+            return Math.round(Math.random()*100);
+        } else {
+            return (Math.random()*100).toFixed(1);
+        }
+    }
+  });
+};
+
+function liquidFillGaugeDefaultSettings(){
+    return {
+        minValue: 0, // The gauge minimum value.
+        maxValue: 100, // The gauge maximum value.
+        circleThickness: 0.05, // The outer circle thickness as a percentage of it's radius.
+        circleFillGap: 0.05, // The size of the gap between the outer circle and wave circle as a percentage of the outer circles radius.
+        circleColor: "#178BCA", // The color of the outer circle.
+        waveHeight: 0.05, // The wave height as a percentage of the radius of the wave circle.
+        waveCount: 1, // The number of full waves per width of the wave circle.
+        waveRiseTime: 1000, // The amount of time in milliseconds for the wave to rise from 0 to it's final height.
+        waveAnimateTime: 18000, // The amount of time in milliseconds for a full wave to enter the wave circle.
+        waveRise: true, // Control if the wave should rise from 0 to it's full height, or start at it's full height.
+        waveHeightScaling: true, // Controls wave size scaling at low and high fill percentages. When true, wave height reaches it's maximum at 50% fill, and minimum at 0% and 100% fill. This helps to prevent the wave from making the wave circle from appear totally full or empty when near it's minimum or maximum fill.
+        waveAnimate: false, // Controls if the wave scrolls or is static.
+        waveColor: "#178BCA", // The color of the fill wave.
+        waveOffset: 0, // The amount to initially offset the wave. 0 = no offset. 1 = offset of one full wave.
+        textVertPosition: .5, // The height at which to display the percentage text withing the wave circle. 0 = bottom, 1 = top.
+        textSize: 1, // The relative height of the text to display in the wave circle. 1 = 50%
+        valueCountUp: false, // If true, the displayed value counts up from 0 to it's final value upon loading. If false, the final value is displayed.
+        displayPercent: true, // If true, a % symbol is displayed after the value.
+        textColor: "#045681", // The color of the value text when the wave does not overlap it.
+        waveTextColor: "#A4DBf8" // The color of the value text when the wave overlaps it.
+    };
+}
+
+function loadLiquidFillGauge(elementId, value, config) {
+
+    d3.select('.' + elementId).select("svg").remove();
+    if(config == null) config = liquidFillGaugeDefaultSettings();
+
+
+    var gauge = d3.select('.' + elementId).append("svg").attr("id", "#" + elementId);
+    var radius = Math.min(parseInt(gauge.style("width")), parseInt(gauge.style("height")))/2;
+    var locationX = parseInt(gauge.style("width"))/2 - radius;
+    var locationY = parseInt(gauge.style("height"))/2 - radius;
+    var fillPercent = Math.max(config.minValue, Math.min(config.maxValue, value))/config.maxValue;
+
+    var waveHeightScale;
+    if(config.waveHeightScaling){
+        waveHeightScale = d3.scaleLinear()
+            .range([0,config.waveHeight,0])
+            .domain([0,50,100]);
+    } else {
+        waveHeightScale = d3.scaleLinear()
+            .range([config.waveHeight,config.waveHeight])
+            .domain([0,100]);
+    }
+
+    var textPixels = (config.textSize*radius/2);
+    console.log(value)
+    var textFinalValue = parseFloat(value).toFixed(2);
+    var textStartValue = config.valueCountUp?config.minValue:textFinalValue;
+    var percentText = config.displayPercent?"%":"";
+    var circleThickness = config.circleThickness * radius;
+    var circleFillGap = config.circleFillGap * radius;
+    var fillCircleMargin = circleThickness + circleFillGap;
+    var fillCircleRadius = radius - fillCircleMargin;
+    var waveHeight = fillCircleRadius*waveHeightScale(fillPercent*100);
+
+    var waveLength = fillCircleRadius*2/config.waveCount;
+    var waveClipCount = 1+config.waveCount;
+    var waveClipWidth = waveLength*waveClipCount;
+
+    // Rounding functions so that the correct number of decimal places is always displayed as the value counts up.
+    var textRounder = function(value){ return Math.round(value); };
+    if(parseFloat(textFinalValue) != parseFloat(textRounder(textFinalValue))){
+        textRounder = function(value){ return parseFloat(value).toFixed(1); };
+    }
+    if(parseFloat(textFinalValue) != parseFloat(textRounder(textFinalValue))){
+        textRounder = function(value){ return parseFloat(value).toFixed(2); };
+    }
+
+    // Data for building the clip wave area.
+    var data = [];
+    for(var i = 0; i <= 40*waveClipCount; i++){
+        data.push({x: i/(40*waveClipCount), y: (i/(40))});
+    }
+
+    // Scales for drawing the outer circle.
+    var gaugeCircleX = d3.scaleLinear().range([0,2*Math.PI]).domain([0,1]);
+    var gaugeCircleY = d3.scaleLinear().range([0,radius]).domain([0,radius]);
+
+    // Scales for controlling the size of the clipping path.
+    var waveScaleX = d3.scaleLinear().range([0,waveClipWidth]).domain([0,1]);
+    var waveScaleY = d3.scaleLinear().range([0,waveHeight]).domain([0,1]);
+
+    // Scales for controlling the position of the clipping path.
+    var waveRiseScale = d3.scaleLinear()
+        // The clipping area size is the height of the fill circle + the wave height, so we position the clip wave
+        // such that the it will overlap the fill circle at all when at 0%, and will totally cover the fill
+        // circle at 100%.
+        .range([(fillCircleMargin+fillCircleRadius*2+waveHeight),(fillCircleMargin-waveHeight)])
+        .domain([0,1]);
+    var waveAnimateScale = d3.scaleLinear()
+        .range([0, waveClipWidth-fillCircleRadius*2]) // Push the clip area one full wave then snap back.
+        .domain([0,1]);
+
+    // Scale for controlling the position of the text within the gauge.
+    var textRiseScaleY = d3.scaleLinear()
+        .range([fillCircleMargin+fillCircleRadius*2,(fillCircleMargin+textPixels*0.7)])
+        .domain([0,1]);
+
+    // Center the gauge within the parent SVG.
+    var gaugeGroup = gauge.append("g")
+        .attr('transform','translate('+locationX+','+locationY+')');
+
+    // Draw the outer circle.
+    var gaugeCircleArc = d3.arc()
+        .startAngle(gaugeCircleX(0))
+        .endAngle(gaugeCircleX(1))
+        .outerRadius(gaugeCircleY(radius))
+        .innerRadius(gaugeCircleY(radius-circleThickness));
+    gaugeGroup.append("path")
+        .attr("d", gaugeCircleArc)
+        .style("fill", config.circleColor)
+        .attr('transform','translate('+radius+','+radius+')');
+
+    // Text where the wave does not overlap.
+    var text1 = gaugeGroup.append("text")
+        .text(textRounder(textStartValue) + percentText)
+        .attr("class", "liquidFillGaugeText")
+        .attr("text-anchor", "middle")
+        .attr("font-size", textPixels + "px")
+        .style("fill", config.textColor)
+        .attr('transform','translate('+radius+','+textRiseScaleY(config.textVertPosition)+')');
+
+    // The clipping wave area.
+    var clipArea = d3.area()
+        .x(function(d) { return waveScaleX(d.x); } )
+        .y0(function(d) { return waveScaleY(Math.sin(Math.PI*2*config.waveOffset*-1 + Math.PI*2*(1-config.waveCount) + d.y*2*Math.PI));} )
+        .y1(function(d) { return (fillCircleRadius*2 + waveHeight); } );
+    var waveGroup = gaugeGroup.append("defs")
+        .append("clipPath")
+        .attr("id", "clipWave" + elementId);
+    var wave = waveGroup.append("path")
+        .datum(data)
+        .attr("d", clipArea)
+        .attr("T", 0);
+
+    // The inner circle with the clipping wave attached.
+    var fillCircleGroup = gaugeGroup.append("g")
+        .attr("clip-path", "url(#clipWave" + elementId + ")");
+    fillCircleGroup.append("circle")
+        .attr("cx", radius)
+        .attr("cy", radius)
+        .attr("r", fillCircleRadius)
+        .style("fill", config.waveColor);
+
+    // Text where the wave does overlap.
+    var text2 = fillCircleGroup.append("text")
+        .text(textRounder(textStartValue) + percentText)
+        .attr("class", "liquidFillGaugeText")
+        .attr("text-anchor", "middle")
+        .attr("font-size", textPixels + "px")
+        .style("fill", config.waveTextColor)
+        .attr('transform','translate('+radius+','+textRiseScaleY(config.textVertPosition)+')');
+
+    // Make the value count up.
+    if(config.valueCountUp){
+        var textTween = function(){
+            var i = d3.interpolate(this.textContent, textFinalValue);
+            return function(t) { this.textContent = textRounder(i(t)) + percentText; }
+        };
+        text1.transition()
+            .duration(config.waveRiseTime)
+            .tween("text", textTween);
+        text2.transition()
+            .duration(config.waveRiseTime)
+            .tween("text", textTween);
+    }
+
+    // Make the wave rise. wave and waveGroup are separate so that horizontal and vertical movement can be controlled independently.
+    var waveGroupXPosition = fillCircleMargin+fillCircleRadius*2-waveClipWidth;
+    if(config.waveRise){
+        waveGroup.attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(0)+')')
+            .transition()
+            .duration(config.waveRiseTime)
+            .attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(fillPercent)+')')
+            .on("start", function(){ wave.attr('transform','translate(1,0)'); }); // This transform is necessary to get the clip wave positioned correctly when waveRise=true and waveAnimate=false. The wave will not position correctly without this, but it's not clear why this is actually necessary.
+    } else {
+        waveGroup.attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(fillPercent)+')');
+    }
+
+    if(config.waveAnimate) animateWave();
+
+    function animateWave() {
+        wave.attr('transform','translate('+waveAnimateScale(wave.attr('T'))+',0)');
+        wave.transition()
+            .duration(config.waveAnimateTime * (1-wave.attr('T')))
+            .ease(d3.easeLinear)
+            .attr('transform','translate('+waveAnimateScale(1)+',0)')
+            .attr('T', 1)
+            .on('end', function(){
+                wave.attr('T', 0);
+                animateWave(config.waveAnimateTime);
+            });
+    }
+
+    function GaugeUpdater(){
+        this.update = function(value){
+            var newFinalValue = parseFloat(value).toFixed(2);
+            var textRounderUpdater = function(value){ return Math.round(value); };
+            if(parseFloat(newFinalValue) != parseFloat(textRounderUpdater(newFinalValue))){
+                textRounderUpdater = function(value){ return parseFloat(value).toFixed(1); };
+            }
+            if(parseFloat(newFinalValue) != parseFloat(textRounderUpdater(newFinalValue))){
+                textRounderUpdater = function(value){ return parseFloat(value).toFixed(2); };
+            }
+
+            var textTween = function(){
+                var i = d3.interpolate(this.textContent, parseFloat(value).toFixed(2));
+                return function(t) { this.textContent = textRounderUpdater(i(t)) + percentText; }
+            };
+
+            text1.transition()
+                .duration(config.waveRiseTime)
+                .tween("text", textTween);
+            text2.transition()
+                .duration(config.waveRiseTime)
+                .tween("text", textTween);
+
+            var fillPercent = Math.max(config.minValue, Math.min(config.maxValue, value))/config.maxValue;
+            var waveHeight = fillCircleRadius*waveHeightScale(fillPercent*100);
+            var waveRiseScale = d3.scaleLinear()
+                // The clipping area size is the height of the fill circle + the wave height, so we position the clip wave
+                // such that the it will overlap the fill circle at all when at 0%, and will totally cover the fill
+                // circle at 100%.
+                .range([(fillCircleMargin+fillCircleRadius*2+waveHeight),(fillCircleMargin-waveHeight)])
+                .domain([0,1]);
+            var newHeight = waveRiseScale(fillPercent);
+            var waveScaleX = d3.scaleLinear().range([0,waveClipWidth]).domain([0,1]);
+            var waveScaleY = d3.scaleLinear().range([0,waveHeight]).domain([0,1]);
+            var newClipArea;
+            if(config.waveHeightScaling){
+                newClipArea = d3.area()
+                    .x(function(d) { return waveScaleX(d.x); } )
+                    .y0(function(d) { return waveScaleY(Math.sin(Math.PI*2*config.waveOffset*-1 + Math.PI*2*(1-config.waveCount) + d.y*2*Math.PI));} )
+                    .y1(function(d) { return (fillCircleRadius*2 + waveHeight); } );
+            } else {
+                newClipArea = clipArea;
+            }
+
+            var newWavePosition = config.waveAnimate?waveAnimateScale(1):0;
+            wave.transition()
+                .duration(0)
+                .transition()
+                .duration(config.waveAnimate?(config.waveAnimateTime * (1-wave.attr('T'))):(config.waveRiseTime))
+                .ease(d3.easeLinear)
+                .attr('d', newClipArea)
+                .attr('transform','translate('+newWavePosition+',0)')
+                .attr('T','1')
+                .on("end", function(){
+                    if(config.waveAnimate){
+                        wave.attr('transform','translate('+waveAnimateScale(0)+',0)');
+                        animateWave(config.waveAnimateTime);
+                    }
+                });
+            waveGroup.transition()
+                .duration(config.waveRiseTime)
+                .attr('transform','translate('+waveGroupXPosition+','+newHeight+')')
+        }
+    }
+
+    return new GaugeUpdater();
+}
+
 // // ************************* Gauge Chart *************************
+
+
+function createWordBubble(business_id){
+    d3.select('.starts').remove();
+    d3.select('.word-bubble').remove();
+    d3.selectAll('.star.rating').remove();
+    var tr = d3.select("#stars").append("div").attr("class","starts")
+    for(var i = 1; i <=5; i++){
+        tr.append("svg").attr("width", 25).attr("height", 25).attr("class","star rating").attr("data-rating",Number(i)).append("polygon").attr("points", "9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78").style("fill-rule","nonzero");
+    };
+
+
+
+    var rating = 2;
+    //console.log(data1)
+  var size = Math.min(Math.min(window.innerWidth, window.innerHeight), 600);
+  var color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+  var chart = d3.select("#word-bubble")
+    .append('svg').attr("class","word-bubble")
+      .attr("width", size)
+      .attr("height", size);
+
+  var pack = d3.pack()
+      .size([size, size])
+      .padding(size*0.005);
+
+  console.log(data1.size)
+  console.log(test)
+     data1.forEach(function(d){
+          console.log("Check")
+          var player = d.business_id
+          var rat = d.stars
+       if (test == player && rat == rating){
+            console.log(d.keys)
+            //console.log(d.dict)
+            keys = JSON.parse(d.keys)
+            counts = JSON.parse(d.dict)
+            //console.log(counts)
+
+               keys.sort(function(a,b) {
+                 return counts[b] - counts[a];
+               });
+
+                //only keep words used 10 or more times
+                keys = keys.filter(function(key) {
+                 return counts[key] >= 5 ? key : '';
+                });
+               var root = d3.hierarchy({children: keys})
+                   .sum(function(d) { console.log(d); return counts[d]; });
+
+
+               var node = chart.selectAll(".node")
+                 .data(pack(root).leaves())
+                 .enter().append("g")
+                   .attr("class", "node")
+                   .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+               node.append("circle")
+                   .attr("id", function(d) {
+                    return d.data; })
+                   .attr("r", function(d) { return d.r; })
+                   .style("fill", function(d) { return color(d.data); });
+
+               node.append("clipPath")
+                   .attr("id", function(d) { return "clip-" + d.data; })
+                 .append("use")
+                   .attr("xlink:href", function(d) { return "#" + d.data; });
+
+               node.append("text").attr("class", "bubbleText")
+                   .attr("clip-path", function(d) { return "url(#clip-" + d.data + ")"; })
+                 .append("tspan")
+                   .attr("x", 0)
+                   .attr("y", function(d) { return d.r/8; })
+                   .attr("font-size", function(d) { return d.r/2; })
+                   .text(function(d) { return d.data; });
+                  node.append("text").attr("class", "bubbleText")
+                   .attr("clip-path", function(d) { return "url(#clip-" + d.data + ")"; })
+                 .append("tspan")
+                   .attr("x", 0)
+                   .attr("y", function(d) { return d.r/8+d.r/2; })
+                   .attr("font-size", function(d) { return d.r/2; })
+                   .text(function(d) { return counts[d.data]; });
+       }
+
+
+     });
+
+
+  $('.star.rating').click(function(){
+    d3.select(".word-bubble").remove();
+    var rating = $(this).data('rating');
+    $(this).parent().parent().attr('data-stars', $(this).data('rating'));
+    var chart = d3.select("#word-bubble")
+    .append('svg').attr("class","word-bubble")
+      .attr("width", size)
+      .attr("height", size);
+
+  var pack = d3.pack()
+      .size([size, size])
+      .padding(size*0.005);
+        console.log(data1[0])
+    console.log(test)
+    data1.forEach(function(d) {
+
+       var player = d.business_id
+
+       var rat = d.stars
+       if (test == player && rat == rating){
+            console.log(player)
+            console.log(d.stars)
+
+
+            keys = JSON.parse(d.keys)
+            counts = JSON.parse(d.dict)
+            console.log(counts)
+            console.log(keys)
+
+
+
+
+               keys.sort(function(a,b) {
+                 return counts[b] - counts[a];
+               });
+
+                //only keep words used 10 or more times
+                keys = keys.filter(function(key) {
+                 return counts[key] >= 5 ? key : '';
+                });
+               var root = d3.hierarchy({children: keys})
+                   .sum(function(d) { console.log(d); return counts[d]; });
+
+
+               var node = chart.selectAll(".node")
+                 .data(pack(root).leaves())
+                 .enter().append("g")
+                   .attr("class", "node")
+                   .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+               node.append("circle")
+                   .attr("id", function(d) { console.log(d); return d.data; })
+                   .attr("r", function(d) { return d.r; })
+                   .style("fill", function(d) { return color(d.data); });
+
+               node.append("clipPath")
+                   .attr("id", function(d) { return "clip-" + d.data; })
+                 .append("use")
+                   .attr("xlink:href", function(d) { return "#" + d.data; });
+
+               node.append("text").attr("class", "bubbleText")
+                   .attr("clip-path", function(d) { return "url(#clip-" + d.data + ")"; })
+                 .append("tspan")
+                   .attr("x", 0)
+                   .attr("y", function(d) { return d.r/8; })
+                   .attr("font-size", function(d) { return d.r/2; })
+                   .text(function(d) { return d.data; });
+
+              node.append("text").attr("class", "bubbleText")
+                    .attr("clip-path", function(d) { return "url(#clip-" + d.data + ")"; })
+                  .append("tspan")
+                    .attr("x", 0)
+                    .attr("y", function(d) { return d.r/8+d.r/2; })
+                    .attr("font-size", function(d) { return d.r/2; })
+                    .text(function(d) { return counts[d.data]; });
+       };
+
+
+   });
+  });
+}
