@@ -871,6 +871,17 @@ function loadLiquidFillGauge(elementId, value, config) {
 
 
     var gauge = d3.select('.' + elementId).append("svg").attr("id", "#" + elementId);
+    var tes = d3.select('.'+elementId).select("#"+elementId)
+    if(elementId == "fillgauge2"){
+        tes.append("svg:title").text("Positive");
+    }
+    if(elementId == "fillgauge3"){
+        tes.append("svg:title").text("Neutral");
+    }
+    if(elementId == "fillgauge4"){
+        tes.append("svg:title").text("Negative");
+    }
+    
     var radius = Math.min(parseInt(gauge.style("width")), parseInt(gauge.style("height")))/2;
     var locationX = parseInt(gauge.style("width"))/2 - radius;
     var locationY = parseInt(gauge.style("height"))/2 - radius;
