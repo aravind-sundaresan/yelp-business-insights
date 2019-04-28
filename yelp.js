@@ -757,7 +757,7 @@ function createTornadoChart(business_id) {
           .attr("x", width/2)
           .attr("y", height + 40)
           .attr("dy", ".35em")
-          .text("(-ve) Sentiment Strength (+ve)")
+          .text("(-ve) Sentiment Strength (+ve)");
 
 
           var chart_heading = svg.append('text')
@@ -768,7 +768,7 @@ function createTornadoChart(business_id) {
           .attr("text-anchor", "middle")
           .style("font-size", "18px")
           .style("text-decoration", "underline")
-          .text("Most Positive and Negative Keywords in Reviews")
+          .text("Most Positive and Negative Characteristics of the Restaurant");
   }
 
   return chart;
