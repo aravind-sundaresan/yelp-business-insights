@@ -402,7 +402,7 @@ svg.append("g")
 svg.append("text")
       .attr("transform",
             "translate(" + (width/2) + " ," +
-                           (height + margin.top + 20) + ")")
+                           (height + margin.top - 15) + ")")
       .style("text-anchor", "middle")
       .text("Year of Review");
 
@@ -527,7 +527,7 @@ var parseDate = d3.timeParse("%Y");
   svg.append("text")
       .attr("transform",
             "translate(" + (width/2) + " ," +
-                           (height + margin.top + 20) + ")")
+                           (height + margin.top - 15) + ")")
       .style("text-anchor", "middle")
       .text("Year of Review");
 
