@@ -870,7 +870,7 @@ function loadLiquidFillGauge(elementId, value, config) {
     if(config == null) config = liquidFillGaugeDefaultSettings();
 
 
-    var gauge = d3.select('.' + elementId).append("svg").attr("id", "#" + elementId);
+    var gauge = d3.select('.' + elementId).append("svg").attr("id", elementId);
     var tes = d3.select('.'+elementId).select("#"+elementId)
     if(elementId == "fillgauge2"){
         tes.append("svg:title").text("Positive");
